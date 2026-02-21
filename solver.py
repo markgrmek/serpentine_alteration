@@ -1,28 +1,11 @@
-from numpy import array, ndarray, linspace, diff, savetxt
-from numpy import max as npmax
-from numpy import abs as npabs
+import numpy as np
 from scipy.interpolate import interp1d
+
 from lookup_table import DATASET
+from const import *
+from utils import pair_avg, normalize
 
-def pair_avg(array: ndarray[int|float]
-             ) -> ndarray[int|float]:
-    return (array[1:]+array[:-1])*0.5
 
-def normalize(array: ndarray
-              ) -> ndarray:
-    return array/max(abs(array))
-#=========================================
-#CONSTANTS
-#=========================================
-
-P: int = 1 #pressure at surface (Pa) - calulated at 0.3 GPa and 2.5 GPa
-T: float =  300 + 273.15 if DATASET == 'lowPT' else 800 + 273.15
-WCO2_B: float = 0.0235 #CO2_s in serpentine
-WCO2_SOAP: float = 0.1488 #CO2_s in soapstone
-POR_B: float = 0.2 #init porosity
-MU_F_B: float = 1 #dynamic viscosity of water at 25C (Pa/s)
-DCO2_B: float = 1 #diffusivity of CO2 in water at 25C (m2/s)
-KMUF_B: float = 1*DCO2_B/P #init permeability/fluid viscosity == k/mu_f
 
 #=========================================
 #SOLVER AND DOMAIN PARAMETERS
@@ -31,7 +14,7 @@ KMUF_B: float = 1*DCO2_B/P #init permeability/fluid viscosity == k/mu_f
 L = 1 #domain length (m)
 N_cells: int = 200 #number of cells
 dx = L/N_cells  #step in x (m)
-x: ndarray[float] = linspace(0,L,N_cells+1) #discrete domain
+x: np.ndarray[float] = np.linspace(0,L,N_cells+1) #discrete domain
 
 time_tot: float = 100*L**2/DCO2_B #total integration time (s)
 N_steps: int = int(1e9) #number of time steps
@@ -94,9 +77,9 @@ lime_interp = interp1d(wCO2_s_tabvals, lime_tabvals, kind=interp_type, fill_valu
 calcite_interp = interp1d(wCO2_s_tabvals, calcite_tabvals, kind=interp_type, fill_value=fill_val)
 corundum_interp = interp1d(wCO2_s_tabvals, corundum_tabvals, kind=interp_type, fill_value=fill_val)
 
-por0: ndarray[float] = array([POR_B]*N_cells) #initial porosity
-wCO2_s0: ndarray[float] = array([WCO2_SOAP]+[WCO2_B]*(N_cells-1)) #initial CO2 fluid (lefftmost cell soapstone, the rest serpentine)
-P_fl0: ndarray[float] = array([P*i/N_cells for i in range(N_cells, 0, -1)]) #initial fluid pressure gradient (from P_0 to 0 as x from 0 to L)
+por0: np.ndarray[float] = np.array([POR_B]*N_cells) #initial porosity
+wCO2_s0: np.ndarray[float] = np.array([WCO2_SOAP]+[WCO2_B]*(N_cells-1)) #initial CO2 fluid (lefftmost cell soapstone, the rest serpentine)
+P_fl0: np.ndarray[float] = np.array([P*i/N_cells for i in range(N_cells, 0, -1)]) #initial fluid pressure gradient (from P_0 to 0 as x from 0 to L)
 
 print(':::CALCULATION STARTED:::')
 wCO2_s = wCO2_s0
@@ -129,11 +112,11 @@ corundum_output: list = []
 
 for time_step in range(N_steps):
     #fetch data from lookup table
-    rho_s: ndarray[float] = rho_s_interp(wCO2_s)
-    rho_fl: ndarray[float] = rho_fl_interp(wCO2_s)
-    wCO2_fl: ndarray[float] = wCO2_fl_interp(wCO2_s)
-    wMg_s: ndarray[float] = wMg_s_interp(wCO2_s)
-    mu_fl: ndarray[float] = mu_fl_interp(wCO2_s)
+    rho_s: np.ndarray[float] = rho_s_interp(wCO2_s)
+    rho_fl: np.ndarray[float] = rho_fl_interp(wCO2_s)
+    wCO2_fl: np.ndarray[float] = wCO2_fl_interp(wCO2_s)
+    wMg_s: np.ndarray[float] = wMg_s_interp(wCO2_s)
+    mu_fl: np.ndarray[float] = mu_fl_interp(wCO2_s)
 
     #calculate imobile species density
     if time_step == 0:
@@ -164,7 +147,7 @@ for time_step in range(N_steps):
         #define proper time step
         dt_diff = 0.45*dx**2/DCO2_B #calulate max time step for diffusion
         dt_adv = rho_fl_avg*perm_avg*P_grad
-        dt_adv = 0.45*dx/npmax(npabs(dt_adv)) #calulate max time step for advection
+        dt_adv = 0.45*dx/np.max(np.abs(dt_adv)) #calulate max time step for advection
         time_remain = time_tot-time #calculate remaining time
         dt = min((dt_diff, dt_adv, time_remain)) #we use whicever timestep is smaller to achieve stability
 
@@ -182,17 +165,17 @@ for time_step in range(N_steps):
 
         #calculate the residual pressure of total mass balance and update pressures (leave out outermost cells == BC)
         P_res = - rho_tot_delta/dt - diff(rho_fl_avg*flux)/dx #this term should ideally be 0
-        sweep_calc = dx**2/npmax(perm_avg*rho_fl_avg)/4*P_res
+        sweep_calc = dx**2/np.max(perm_avg*rho_fl_avg)/4*P_res
         P_fl[1:-1] = P_fl[1:-1] + sweep_calc
 
-        if npmax(npabs(P_res)) <= tolerance: #break when the pressure is sufficiently swept
+        if np.max(np.abs(P_res)) <= tolerance: #break when the pressure is sufficiently swept
             break
 
         if sweep == N_sweeps:
             print('Pressure sweeping failed. Adjust parameters')
     
     #diffusivity flux
-    diff_flux = -dCO2_avg*diff(mu_fl)/dx
+    diff_flux = -dCO2_avg*np.diff(mu_fl)/dx
 
     #adjust the weight fraction of CO2 in the system - leave out the boundary conditions (leftmost is already soapstone, rightmost stays serpentine)
     rho_CO2_tot_itm = diff_flux + rho_CO2_fl_avg*flux
@@ -249,7 +232,7 @@ for time_step in range(N_steps):
         print(':::CALULCATION FINISHED:::')
         print('saving results...')
 
-        wCO2_s_output = array(wCO2_s_output)
+        wCO2_s_output = np.array(wCO2_s_output)
         savetxt(fname=f'grid_{DATASET}.csv', X=x, delimiter=',', fmt='%f')
         savetxt(fname=f'time_{DATASET}.csv', X=time_output, delimiter=',', fmt='%.18e')
         savetxt(fname=f'wCO2_s_{DATASET}.csv',X=wCO2_s_output,delimiter=',',fmt='%.18e')

@@ -8,7 +8,7 @@ def normalize(array: np.ndarray
               ) -> np.ndarray:
     return array/max(abs(array))
 
-single_lookup = read_csv(f'single_output_lowPT.csv')
+single_lookup = read_csv(f'data/single_output_lowPT.csv')
 
 #caluclate oxide abundances
 
