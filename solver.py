@@ -1,261 +1,179 @@
 import numpy as np
-from scipy.interpolate import interp1d
-
-from lookup_table import DATASET
 from const import *
-from utils import pair_avg, normalize
+from utils import pair_avg, create_solver_interpolators, absmax
 
-
-
-#=========================================
-#SOLVER AND DOMAIN PARAMETERS
-#=========================================
-
-L = 1 #domain length (m)
-N_cells: int = 200 #number of cells
-dx = L/N_cells  #step in x (m)
-x: np.ndarray[float] = np.linspace(0,L,N_cells+1) #discrete domain
-
-time_tot: float = 100*L**2/DCO2_B #total integration time (s)
-N_steps: int = int(1e9) #number of time steps
-
+#GENERAL SOLVER PARAMS----------------------------------------------------------
+PTtype: str = 'lowPT'
 npow: int = 3 #non linearity in permeability
 N_sweeps: int = int(1e5) #number of sweeps
 N_Pf_max: int = int(1e4) #maximum number of fluid pressure sweeps
-tolerance: float = 1e-6 #tolerance of our approximation
-dec_print: int = 10 #decimal precision when printing result
+tolerance: float = 1e-6 #tolerance of approximation
+interp = create_solver_interpolators(PTtype)
+
+#DOMAIN-------------------------------------------------------------------------
+L: float = 1.0 #domain length (m)
+N_cells: int = 200 #number of cells
+x: np.ndarray  = np.linspace(0, L, N_cells+1) #discrete domain
+dx: float = L/N_cells  #step in x (m)
+pres: float = P[PTtype]
+
+#TIME---------------------------------------------------------------------------
+time_tot: float = 0.002 #100*L**2/DCO2_B #total integration time (s)
+N_steps: int = int(1e9) #number of time steps
+N_steps_in_epoch: int = 100 #results get stored per each epoch
+
+#INITIAL CONDITIONS-------------------------------------------------------------
+por0: np.ndarray = np.full(N_cells, POR_B) #initial porosity
+P_fl0: np.ndarray = np.linspace(pres, 0, N_cells) #initial fluid pressure gradient (from P_0 to 0 as x from 0 to L)
+wCO2_s0: np.ndarray = np.full(N_cells, WCO2_B) #initial CO2 fluid (the rest serpentine)
+wCO2_s0[0] = WCO2_SOAP #first cell is soapstone
+
+#CREATE OUTPUT DICTIONARY-------------------------------------------------------
+interp_outputs = {col: [] for col in INTERP_MAP.keys() if col in interp.keys()} #the interpolation vars that overlap
+noninterp_outputs = {col: [] for col in NONINTERP_MAP.keys()}
 
 
-print(':::CREATING INTERPOLATING FUNCTIONS:::')
-
-single_lookup = single_lookup[single_lookup['T'] == T]
-single_lookup = single_lookup.groupby(by='wCO2_s').mean()
-wCO2_s_tabvals = single_lookup.index.to_numpy()
-
-
-rho_s_norm = normalize(single_lookup['rho_s'].to_numpy().reshape(-1))
-rho_fl_norm = normalize(single_lookup['rho_fl'].to_numpy().reshape(-1))
-mu_fl_norm = normalize(single_lookup['mu_fl'].to_numpy().reshape(-1))
-wCO2_fl_tabvals = single_lookup['wCO2_fl'].to_numpy().reshape(-1)
-wMg_s_tabvals = single_lookup['wMg_s'].to_numpy().reshape(-1)
-wSiO2_s_tabvals = single_lookup['wSiO2_s'].to_numpy().reshape(-1)
-wH2O_s_tabvals = single_lookup['wH2O_s'].to_numpy().reshape(-1)
-dolomite_tabvals = single_lookup['Dolomite'].to_numpy().reshape(-1)
-antigorite_tabvals = single_lookup['Antigorite'].to_numpy().reshape(-1)
-talc_tabvals = single_lookup['Talc'].to_numpy().reshape(-1)
-magnesite_tabvals = single_lookup['Magnesite'].to_numpy().reshape(-1)
-chlorite_tabvals = single_lookup['Chlorite'].to_numpy().reshape(-1)
-orthopyroxene_tabvals = single_lookup['Orthopyroxene'].to_numpy().reshape(-1)
-olivine_tabvals = single_lookup['Olivine'].to_numpy().reshape(-1)
-quartz_tabvals = single_lookup['q,tc-ds633'].to_numpy().reshape(-1)
-magnetite_tabvals = single_lookup['mt,tc-ds633'].to_numpy().reshape(-1)
-hematite_tabvals = single_lookup['hem,tc-ds633'].to_numpy().reshape(-1)
-lime_tabvals = single_lookup['lime,tc-ds633'].to_numpy().reshape(-1)
-calcite_tabvals = single_lookup['cc,tc-ds633'].to_numpy().reshape(-1)
-corundum_tabvals = single_lookup['cor,tc-ds633'].to_numpy().reshape(-1)
-
-interp_type = 'linear'
-fill_val = 'extrapolate'
-rho_s_interp = interp1d(wCO2_s_tabvals, rho_s_norm, kind=interp_type, fill_value=fill_val)
-rho_fl_interp = interp1d(wCO2_s_tabvals, rho_fl_norm, kind=interp_type, fill_value=fill_val)
-wCO2_fl_interp = interp1d(wCO2_s_tabvals, wCO2_fl_tabvals, kind=interp_type, fill_value=fill_val)
-wMg_s_interp = interp1d(wCO2_s_tabvals, wMg_s_tabvals, kind=interp_type, fill_value=fill_val)
-mu_fl_interp = interp1d(wCO2_s_tabvals, mu_fl_norm, kind=interp_type, fill_value=fill_val)
-wSiO2_s_interp = interp1d(wCO2_s_tabvals, wSiO2_s_tabvals, kind=interp_type, fill_value=fill_val)
-wH2O_s_interp = interp1d(wCO2_s_tabvals, wH2O_s_tabvals, kind=interp_type, fill_value=fill_val)
-dolomite_interp = interp1d(wCO2_s_tabvals, dolomite_tabvals, kind=interp_type, fill_value=fill_val)
-antigorite_interp = interp1d(wCO2_s_tabvals, antigorite_tabvals, kind=interp_type, fill_value=fill_val)
-talc_interp = interp1d(wCO2_s_tabvals, talc_tabvals, kind=interp_type, fill_value=fill_val)
-magnesite_interp = interp1d(wCO2_s_tabvals, magnesite_tabvals, kind=interp_type, fill_value=fill_val)
-chlorite_interp = interp1d(wCO2_s_tabvals, chlorite_tabvals, kind=interp_type, fill_value=fill_val)
-orthopyroxene_interp = interp1d(wCO2_s_tabvals, orthopyroxene_tabvals, kind=interp_type, fill_value=fill_val)
-olivine_interp = interp1d(wCO2_s_tabvals, olivine_tabvals, kind=interp_type, fill_value=fill_val)
-quartz_interp = interp1d(wCO2_s_tabvals, quartz_tabvals, kind=interp_type, fill_value=fill_val)
-magnetite_interp = interp1d(wCO2_s_tabvals, magnetite_tabvals, kind=interp_type, fill_value=fill_val)
-hematite_interp = interp1d(wCO2_s_tabvals, hematite_tabvals, kind=interp_type, fill_value=fill_val)
-lime_interp = interp1d(wCO2_s_tabvals, lime_tabvals, kind=interp_type, fill_value=fill_val)
-calcite_interp = interp1d(wCO2_s_tabvals, calcite_tabvals, kind=interp_type, fill_value=fill_val)
-corundum_interp = interp1d(wCO2_s_tabvals, corundum_tabvals, kind=interp_type, fill_value=fill_val)
-
-por0: np.ndarray[float] = np.array([POR_B]*N_cells) #initial porosity
-wCO2_s0: np.ndarray[float] = np.array([WCO2_SOAP]+[WCO2_B]*(N_cells-1)) #initial CO2 fluid (lefftmost cell soapstone, the rest serpentine)
-P_fl0: np.ndarray[float] = np.array([P*i/N_cells for i in range(N_cells, 0, -1)]) #initial fluid pressure gradient (from P_0 to 0 as x from 0 to L)
-
-print(':::CALCULATION STARTED:::')
-wCO2_s = wCO2_s0
-P_fl = P_fl0
-time = 0
+print(':::STARTED SIMULAITON:::')
+#PLACE HOLDERS
+wCO2_s = wCO2_s0.copy()
+P_fl = P_fl0.copy()
 por_rho_s_wMg0 = None #mass of immobile species at t=0
 rho_tot_prev = None #total density at previous time step
 
-#OUTPUT ARRAYS
-time_output: list = []
-wCO2_s_output: list = []
-wCO2_fl_output: list = []
-por_output: list = []
-density_output: list = []
-wSiO2_s_output: list = []
-wH2O_s_output: list = []
-dolomite_output: list = []
-antigorite_output: list = []
-talc_output: list = []
-magnesite_output: list = []
-chlorite_output: list = []
-orthopyroxene_output: list = []
-olivine_output: list = []
-quartz_output: list = []
-magnetite_output: list = []
-hematite_output: list = []
-lime_output: list = []
-calcite_output: list = []
-corundum_output: list = []
-
+time = 0
 for time_step in range(N_steps):
-    #fetch data from lookup table
-    rho_s: np.ndarray[float] = rho_s_interp(wCO2_s)
-    rho_fl: np.ndarray[float] = rho_fl_interp(wCO2_s)
-    wCO2_fl: np.ndarray[float] = wCO2_fl_interp(wCO2_s)
-    wMg_s: np.ndarray[float] = wMg_s_interp(wCO2_s)
-    mu_fl: np.ndarray[float] = mu_fl_interp(wCO2_s)
+    
+    #CALC VARS WITH INTERPOLATION--------------------------------------------
+    rho_s  = interp['rho_s'](wCO2_s)
+    rho_fl = interp['rho_fl'](wCO2_s)
+    wCO2_fl = interp['wCO2_fl'](wCO2_s)
+    wMg_s = interp['wMg_s'](wCO2_s)
+    mu_fl = interp['mu_fl'](wCO2_s)
 
-    #calculate imobile species density
-    if time_step == 0:
-        por_rho_s_wMg0 = rho_s*wMg_s*(1-por0) #store initial value
+    #CALCULATE IMMOBILE SPECIES DENSITY--------------------------------------
+    if time_step == 0: 
+        por_rho_s_wMg0 = rho_s * wMg_s * (1-por0) #store initial value
 
-    rho_im = rho_s*wMg_s
-    por = 1 - por_rho_s_wMg0/rho_im #calulcate porosity
-    rho_tot = rho_fl*por + rho_s*(1-por) #calulcate total density
+    rho_im = rho_s * wMg_s #calculate imobile species density
+    por = 1 - por_rho_s_wMg0 / rho_im #calulcate porosity
+    rho_tot = rho_fl * por + rho_s * (1-por) #calulcate total density
+
     if time_step == 0:
         rho_tot_prev = rho_tot #store initial value
-    rho_CO2_tot = rho_fl*por*wCO2_fl + rho_s*(1-por)*wCO2_s #calculate total rho CO2
 
-        #ARRAY SIZE -1
-    #average values between the nodes
+    rho_CO2_tot = rho_fl * por * wCO2_fl + rho_s * wCO2_s * (1-por) #calculate total rho CO2
+
+    #AVERAGE VALUES ON INTERFACES BETWEEN NODES--------------------------------
     rho_fl_avg = pair_avg(rho_fl) #density of fluid
-    rho_CO2_fl_avg = rho_fl*wCO2_fl
+    rho_CO2_fl_avg = rho_fl * wCO2_fl
     rho_CO2_fl_avg = pair_avg(rho_CO2_fl_avg) #density of CO2_fl in the system
     por_avg = pair_avg(por) #porosity
-    perm_avg = KMUF_B*por_avg**npow  #permeability (muf = muf0*muf_r, thus k_muf0/muf_r = m_muf)
-    dCO2_avg = rho_CO2_fl_avg*por_avg*DCO2_B #diffusivity
+    perm_avg = KMUF_B * por_avg**npow  #permeability
+    dCO2_avg = rho_CO2_fl_avg * por_avg * DCO2_B #diffusivity
 
-    #PRESSURE SWEEPS
+    #PRESSURE SWEEPS-------------------------------------------------------------
     rho_tot_delta = rho_tot[1:-1]-rho_tot_prev[1:-1]
     for sweep in range(N_sweeps):
-        P_grad = diff(P_fl)/dx #calculate pressure gradient in x
+        P_grad = np.diff(P_fl) / dx #calculate pressure gradient in x
 
-
-        #define proper time step
-        dt_diff = 0.45*dx**2/DCO2_B #calulate max time step for diffusion
-        dt_adv = rho_fl_avg*perm_avg*P_grad
-        dt_adv = 0.45*dx/np.max(np.abs(dt_adv)) #calulate max time step for advection
-        time_remain = time_tot-time #calculate remaining time
-        dt = min((dt_diff, dt_adv, time_remain)) #we use whicever timestep is smaller to achieve stability
+        #DEFINE PROPER TIME STEP--------------------------------------------------
+        dt_diff = 0.45 * dx**2 / DCO2_B #calulate max time step for diffusion
+        dt_adv = rho_fl_avg * perm_avg * P_grad
+        dt_adv = 0.45 * dx / absmax(dt_adv) #calulate max time step for advection
+        time_remain = time_tot - time #calculate remaining time
+        dt = np.min((dt_diff, dt_adv, time_remain)) #we use whicever timestep is smaller to achieve stability
 
         #dt is the bottle neck 
-        if (dt == 0.0 and 
-            time_remain == 0.0): #end of simulation
+        if dt == 0.0 and time_remain == 0.0: #end of simulation
             break
         
-        elif (dt == 0.0 and 
-              time_remain > 0.0): #dt is 0 but we are not at the end
+        elif dt == 0.0 and time_remain > 0.0: #dt is 0 but we are not at the end
             raise ValueError('dt is 0')
 
-        #calulate Darcy flux
-        flux = -perm_avg*P_grad
+        #CALCULATE DARY FLUX--------------------------------------------------------
+        flux = - perm_avg * P_grad
 
-        #calculate the residual pressure of total mass balance and update pressures (leave out outermost cells == BC)
-        P_res = - rho_tot_delta/dt - diff(rho_fl_avg*flux)/dx #this term should ideally be 0
-        sweep_calc = dx**2/np.max(perm_avg*rho_fl_avg)/4*P_res
+        #CALC THE RESIDUAL PRES. OF TOTAL MASS BALANCE AND UPDATE PRES.
+        #(leave out outermost cells <-> BC)
+        P_res = - rho_tot_delta / dt - np.diff(rho_fl_avg * flux) / dx #this term should ideally be 0
+        sweep_calc = (P_res *dx**2) / (np.max(perm_avg * rho_fl_avg) * 4)
         P_fl[1:-1] = P_fl[1:-1] + sweep_calc
 
-        if np.max(np.abs(P_res)) <= tolerance: #break when the pressure is sufficiently swept
+        if absmax(P_res) <= tolerance: #break when the pressure is sufficiently swept
             break
 
         if sweep == N_sweeps:
-            print('Pressure sweeping failed. Adjust parameters')
+            raise ValueError('Pressure sweeping failed. Adjust parameters')
     
-    #diffusivity flux
-    diff_flux = -dCO2_avg*np.diff(mu_fl)/dx
+    #DIFFUSIVITY FLUX-------------------------------------------------------------
+    diff_flux = - dCO2_avg * np.diff(mu_fl) / dx
 
-    #adjust the weight fraction of CO2 in the system - leave out the boundary conditions (leftmost is already soapstone, rightmost stays serpentine)
-    rho_CO2_tot_itm = diff_flux + rho_CO2_fl_avg*flux
-    rho_CO2_tot_itm = diff(rho_CO2_tot_itm)
-    rho_CO2_tot[1:-1] = rho_CO2_tot[1:-1] - dt*(rho_CO2_tot_itm/dx)
+    #ADJUST THE MASS FRAC. OF CO2 IN THE SYSTEM
+    # leave out the boundary conditions (leftmost is already soapstone, rightmost stays serpentine)
+    rho_CO2_tot_itm = diff_flux + rho_CO2_fl_avg * flux
+    rho_CO2_tot_itm = np.diff(rho_CO2_tot_itm)
+    rho_CO2_tot[1:-1] = rho_CO2_tot[1:-1] - dt * rho_CO2_tot_itm / dx
 
-    #calculate new value of CO2 in fluid from the balance equation
-    wCO2_s = (rho_CO2_tot - wCO2_fl*rho_fl*por)/rho_s/(1-por)
+    #CALC NEW CO2 IN FLUID VAL. FROM BALANCE EQ.
+    wCO2_s = (rho_CO2_tot - wCO2_fl * rho_fl * por)/(rho_s * (1-por))
 
-    #UPDATE VALUES ---------------------------------
+    #UPDATE VALUES-----------------------------------------------------------------
+    rho_tot_prev = rho_tot
+    time += dt
+
     #P_fl gets update inside the loop
     #wCO2_s gets updated at the end
     #rho_im0 gets updated just in the first iteration (rho_im at t=0)
-    rho_tot_prev = rho_tot
-    time += dt
    
-    #PRINT RESULTS-----------------------------------
-    if time_step % 100 == 0: #print out result of each time step
+    #PRINT RESULTS-----------------------------------------------------------------
+    if time_step % N_steps_in_epoch == 0: #print out result of each time step
         print(f"""
-                :::TIMESTEP: {time_step} => TIME: {time}s of {time_tot}s:::
-                Domain: {x[:2].round(dec_print)} ... {x[-2:].round(dec_print)};
-                Fluid pressure: {P_fl[:2].round(dec_print)} ... {P_fl[-2:].round(dec_print)};
-                CO2 in solids: {wCO2_s[:2].round(dec_print)} ... {wCO2_s[-2:].round(dec_print)};
-                Porosity: {por[:2].round(dec_print)} ... {por[-2:].round(dec_print)};
-                Permeability: {perm_avg[:2].round(dec_print)} ... {perm_avg[-2:].round(dec_print)};
-                CO2 diffusivity: {dCO2_avg[:2].round(dec_print)} ... {dCO2_avg[-2:].round(dec_print)};
-                """)
+            =========================================================================
+            :::TIMESTEP: {time_step} => TIME: {time}s of {time_tot}s:::
+            =========================================================================
+            Domain: {x[0]:.2e}, {x[1]:.2e} ... {x[-2]:.2e},{x[-1]:.2e};
+            Fluid pressure: {P_fl[0]:.2e}, {P_fl[1]:.2e} ... {P_fl[-2]:.2e}, {P_fl[-1]:.2e};
+            CO2 in solids: {wCO2_s[0]:.2e}, {wCO2_s[1]:.2e} ... {wCO2_s[-2]:.2e}, {wCO2_s[-1]:.2e};
+            Porosity: {por[0]:.2e}, {por[1]:.2e} ... {por[-2]:.2e}, {por[-1]:.2e};
+            Permeability: {perm_avg[0]:.2e}, {perm_avg[1]:.2e} ... {perm_avg[-2]:.2e}, {perm_avg[-1]:.2e};
+            CO2 diffusivity: {dCO2_avg[0]:.2e}, {dCO2_avg[1]:.2e} ... {dCO2_avg[-2]:.2e}, {dCO2_avg[-1]:.2e};
+            """
+        )
         
         print('storing results...')
-        #Add results
-        time_output.append(time)
-        wCO2_s_output.append(wCO2_s)
-        wCO2_fl_output.append(wCO2_fl)
-        por_output.append(por)
-        density_output.append(rho_tot)
-        wSiO2_s_output.append(wSiO2_s_interp(wCO2_s))
-        wH2O_s_output.append(wH2O_s_interp(wCO2_s))
-        dolomite_output.append(dolomite_interp(wCO2_s))
-        antigorite_output.append(antigorite_interp(wCO2_s))
-        talc_output.append(talc_interp(wCO2_s))
-        magnesite_output.append(magnesite_interp(wCO2_s))
-        chlorite_output.append(chlorite_interp(wCO2_s))
-        orthopyroxene_output.append(orthopyroxene_interp(wCO2_s))
-        olivine_output.append(olivine_interp(wCO2_s))
-        quartz_output.append(quartz_interp(wCO2_s))
-        magnetite_output.append(magnetite_interp(wCO2_s))
-        hematite_output.append(hematite_interp(wCO2_s))
-        lime_output.append(lime_interp(wCO2_s))
-        calcite_output.append(calcite_interp(wCO2_s))
-        corundum_output.append(corundum_interp(wCO2_s))
-    
-    #SAVE RESULTS
-    if time == time_tot or time_step==(N_steps-1):
-        print(':::CALULCATION FINISHED:::')
-        print('saving results...')
 
-        wCO2_s_output = np.array(wCO2_s_output)
-        savetxt(fname=f'grid_{DATASET}.csv', X=x, delimiter=',', fmt='%f')
-        savetxt(fname=f'time_{DATASET}.csv', X=time_output, delimiter=',', fmt='%.18e')
-        savetxt(fname=f'wCO2_s_{DATASET}.csv',X=wCO2_s_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'wCO2_fl_{DATASET}.csv',X=wCO2_fl_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'por_{DATASET}.csv',X=por_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'density_{DATASET}.csv',X=density_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'wSiO2_s_{DATASET}.csv',X=wSiO2_s_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'wH2O_s_{DATASET}.csv',X=wH2O_s_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'dolomite_{DATASET}.csv',X=dolomite_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'antigorite_{DATASET}.csv',X=antigorite_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'talc_{DATASET}.csv',X=talc_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'magnesite_{DATASET}.csv',X=magnesite_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'chlorite_{DATASET}.csv',X=chlorite_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'orthopyroxene_{DATASET}.csv',X=orthopyroxene_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'olivine_{DATASET}.csv',X=olivine_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'quartz_{DATASET}.csv',X=quartz_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'magnetite_{DATASET}.csv',X=magnetite_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'hematite_{DATASET}.csv',X=hematite_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'lime_{DATASET}.csv',X=lime_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'calcite_{DATASET}.csv',X=calcite_output,delimiter=',',fmt='%.18e')
-        savetxt(fname=f'corundum_{DATASET}.csv',X=corundum_output,delimiter=',',fmt='%.18e')
+
+        #APPEND RESULTS------------------------------------------------------------
+            # calculated (non-interpolted) variables
+        noninterp_outputs['time'].append(time)
+        noninterp_outputs['wCO2_s'].append(wCO2_s)
+        noninterp_outputs['wCO2_fl'].append(wCO2_fl)
+        noninterp_outputs['por'].append(por)
+        noninterp_outputs['rho_tot'].append(rho_tot)
+
+            # interpolated variables
+        for key in interp_outputs.keys():
+            interp_outputs[key].append(interp[key](wCO2_s))
+
+        print('results stored. Simulating next epoch...')
+
+    #SAVE RESULTS--------------------------------------------------------------------
+    if time == time_tot or time_step==(N_steps-1):
+        print(':::SIMULATION FINISHED:::')
+        print('writing results to file...')
+
+        output = noninterp_outputs | interp_outputs #combine the two outputs
+        output['grid'] = x #add the grid as well for easier plotting
+
+        for key in output.keys():
+            output[key] = np.array(output[key])
+
+        np.savez_compressed(f'outputs/simulation_{PTtype}', **output)
+
+        print('results file sucessfuly created...')
+        print(':::PROCESS FINISHED:::')
+
         break
 
 
         
-

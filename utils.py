@@ -2,7 +2,12 @@ import pandas as pd
 import numpy as np
 from typing import Literal
 from scipy.interpolate import interp1d
-from const import T, COLUMN_MAP, MOLAR_MASS
+from const import T, MOLAR_MASS, DCO2_B
+
+def absmax(
+        array: np.ndarray[float]
+        ) -> float:
+    return np.max(np.abs(array))
 
 def pair_avg(
         array: np.ndarray[float]
@@ -15,6 +20,11 @@ def normalize(
         ) -> np.ndarray[float]:
 
     return array/max(abs(array))
+
+def conv_t_years(
+        time: float
+        ) -> float:
+    return time/(DCO2_B*365*24*60*60)
 
 def fetch_lookup_df(
         dataset: Literal['general', 'solver'],
@@ -40,6 +50,7 @@ def create_solver_interpolators(
     df = fetch_lookup_df('solver', PTtype)
     df = df[df['T'] == T[PTtype]]
     df = df.groupby(by='wCO2_s', as_index=False).mean() #group such that each wCO2_s point is unique
+    df = df.drop(columns=['T'])
 
     #PREPARE INTERPOLATION DATA
     to_normalize = ('rho_s', 'rho_fl', 'mu_fl') #these must be normalized
@@ -54,5 +65,6 @@ def create_solver_interpolators(
         
     return output
 
+
 if __name__ == '__main__':
-    inte = create_solver_interpolators('lowPT')
+    print(1)
