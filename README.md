@@ -92,6 +92,8 @@ The thermodynamic equlibrium solid solution model was first assumed for 2 sepera
 \text{H}_2\text{O}: 9.68\%
 ```
 
+The solid phases used in the model were Dolomite, Antigorite, Talc, Magnesite, Chlorite, Brucite, Orthopyroxene, Olivine, Quartz, Periclase, Corundum, Andalusite, Magnetite, Hematite, Lime and Calcite. The fluid phase used in the model was $\text{H}_2\text{O} - \text{CO}_2$
+
 ## Running the Script
 
 ### Environment Setup
