@@ -20,6 +20,8 @@ Fluid-rock interactions provide a link between chemical reactions and mass-energ
 
 The main serpentine minerals are antigorite, chrysotile and lizardite, which are associated with ultramafic igneous rock formations. The petrological compositional space thus consists of $\text{SiO}_2$, $\text{Al}_2\text{O}_3$, $\text{MgO}$, $\text{FeO}$, $\text{Fe}_2\text{O}_3$  $\text{H}_2\text{O}$, $\text{CO}_2$ and $\text{CaO}$.
 
+### Physical Background
+
 The 1D alteration of serpentine can be described with the following advection-diffusion-reaction equation
 
 ```math
@@ -68,7 +70,27 @@ where $C_f^{\text{CO}_2}$ and $C_s^{\text{CO}_2}$ are the maass fractions of $\t
 \phi(v_f - v_s) = - \frac{k\phi^3}{\mu_f}\left(\frac{\partial p_f}{\partial x} + \rho_sg\right)
 ```
 
-where $k$ is the permeability, $\mu_f$ is the dynamic viscosity of the fluid, $p_f$ is the fluid pressure and $g$ is the gravitational constant.
+where $k$ is the permeability, $\mu_f$ is the dynamic viscosity of the fluid, $p_f$ is the fluid pressure and $g$ is the gravitational constant. The system of 3 unknowns is governed by 3 equations, making it solvalble, however it is very non-linear. For that reason a simple finite difference scheme was adopted according to [Beinlich et. al. 2020](https://www.nature.com/articles/s41561-020-0554-9)
+
+### Methods
+
+The thermodynamic equlibrium solid solution model was first assumed for 2 seperate Pressure and Temperature (PT) conditions, namely for low PT condiitons (0.3 GPa and 300°C, Beinlich et. al. 2020) and for high PT conditions (2.5 GPa and 800°C, Ota et. al. 2004). The two equilibrium thermodynamic models were then simulated in [Thermolab](https://hansjcv.github.io/Thermolab/) assuming the following oxide weight fractions (Beinlich et. al. 2020):
+
+```math
+\text{CaO}: 1.01\% ;
+\quad
+\text{SiO}_2: 40.08\% ;
+\quad
+\text{Al}_2\text{O}_3: 2.43\% ;
+\quad
+\text{MgO}: 34.97\% ;
+\quad
+\text{FeO}: 4.22\% ;
+\quad
+\text{Fe}_2\text{O}_3: 8.25\% ;
+\quad
+\text{H}_2\text{O}: 9.68\%
+```
 
 ## Running the Script
 
