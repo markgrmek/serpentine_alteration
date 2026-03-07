@@ -64,7 +64,7 @@ where $C_s^m$ is the weight fraction of the mobile oxides, namely $\text{H}_2\te
 \right]
 ```
 
-where $C_f^{\text{CO}_2}$ and $C_s^{\text{CO}_2}$ are the maass fractions of $\text{CO}_2$ in fluids and solids, respectivley and $D_f^{\text{CO}_2}$ is the diffusion coefficient of $\text{CO}_2$ in the fluid. Lastly, the fluid flow can be described with Darcy's law (where the velocity of solids $v_s$ is assumed to be 0):
+where $C_f^{\text{CO}_2}$ and $C_s^{\text{CO}_2}$ are the mass fractions of $\text{CO}_2$ in fluids and solids, respectivley and $D_f^{\text{CO}_2}$ is the diffusion coefficient of $\text{CO}_2$ in the fluid. Lastly, the fluid flow can be described with Darcy's law (where the velocity of solids $v_s$ is assumed to be 0):
 
 ```math
 \phi(v_f - v_s) = - \frac{k\phi^3}{\mu_f}\left(\frac{\partial p_f}{\partial x} + \rho_sg\right)
@@ -92,7 +92,15 @@ The thermodynamic equlibrium solid solution model was first assumed for 2 sepera
 \text{H}_2\text{O}: 9.68\%
 ```
 
-The solid phases used in the model were Dolomite, Antigorite, Talc, Magnesite, Chlorite, Brucite, Orthopyroxene, Olivine, Quartz, Periclase, Corundum, Andalusite, Magnetite, Hematite, Lime and Calcite. The fluid phase used in the model was $\text{H}_2\text{O} - \text{CO}_2$
+The solid phases used in the model were Dolomite, Antigorite, Talc, Magnesite, Chlorite, Brucite, Orthopyroxene, Olivine, Quartz, Periclase, Corundum, Andalusite, Magnetite, Hematite, Lime and Calcite. The fluid phase used in the model was $\text{H}_2\text{O} - \text{CO}_2$. The obtained equilibrium thermodynamic variables were then stored and used as a lookup table in the main diffusion-advection-reaction equation simulation. The simulation domain of $L=1m$ was partitioned into 100 cells. At $t=0$ porosity $\phi$ was assumed constant across all cells, while the fluid pressure $p_f$ was assumed as a uniform gradient from $x=0$ to $x=1$ going from 0.3 GPa to 0.0 GPa for low PT conditions and 2.5 GPa to 0.0 GPa for low PT conditions. The use of the lookup table in the simulation in a single time step was used as such:
+
+1. From the lookup table fetch $C_s^{\text{CO}_2}$
+2. From the lookup table fetch $\rho_s$, $\rho_f$, $\mu_f$ and $C_s^{\text{MgO}_2}$. The latter represents the mass fraction of immobile solid species
+3. Get the values of $\rho_s$, $\rho_f$, $\mu_f$ and $C_s^{\text{MgO}_2}$ by preforming linear interpolation in respect to $C_s^{\text{CO}_2}$
+4. Preform calculations with the obtained values of $\rho_s$, $\rho_f$, $\mu_f$ and $C_s^{\text{MgO}_2}$
+5. Update $C_s^{\text{CO}_2}$ and $\mu_f$
+
+
 
 ## Running the Script
 
