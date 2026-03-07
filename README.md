@@ -10,7 +10,7 @@ Fluid-rock interactions provide a link between chemical reactions and mass-energ
 
 $\underbrace{2\text{Mg}_3\text{Si}_2\text{O}_5\text{(OH)}_4} _{\text{Serpentine}} + 3\text{CO} _{2,aq} \to \underbrace{3\text{MgCO}_3} _{\text{Magnesite}} + \underbrace{\text{Mg}_3\text{Si}_4\text{O} _{10}\text{OH}_2} _{\text{Talc}} + 3\text{H}_2\text{0} \left( + \text{Chlorite} \right)$
 
-
+The main serpentine minerals are antigorite, chrysotile and lizardite, which are associated with ultramafic igneous rock formations. The petrological compositional space thus consists of $\text{SiO}_2$, $\text{Al}_2\text{O}_3$, $\text{MgO}$, $\text{FeO}$, $\text{Fe}_2\text{O}_3$  $\text{H}_2\text{O}$, $\text{CO}_2$ and $\text{CaO}$.
 
 ## Running the Script
 
