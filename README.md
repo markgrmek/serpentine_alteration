@@ -38,29 +38,37 @@ where $\rho_s$ and $\rho_f$ are the solids and fluid density respectivley, $\phi
 = 0
 ```
 
-where $C_s^m$ is the weight fraction of the mobile oxides, namely $\text{H}_2\text{O}$, $\text{CO}_2$ and $\text{SiO}_2$. Lastly, the conservation of total $\text{CO}_2$ is enforced by satisfying:
+where $C_s^m$ is the weight fraction of the mobile oxides, namely $\text{H}_2\text{O}$, $\text{CO}_2$ and $\text{SiO}_2$. Furthermore, the conservation of total $\text{CO}_2$ is enforced by satisfying:
 
 ```math
 \frac{\partial}{\partial t}
 \left[
-\rho_f \phi C_f^{\mathrm{CO}_2}
+\rho_f \phi C_f^{\text{CO}_2}
 +
-\rho_s (1-\phi) C_s^{\mathrm{CO}_2}
+\rho_s (1-\phi) C_s^{\text{CO}_2}
 \right]
 +
 \frac{\partial}{\partial x}
 \left[
-\rho_f \phi C_f^{\mathrm{CO}_2} v_f
+\rho_f \phi C_f^{\text{CO}_2} v_f
 +
-\rho_s (1-\phi) C_s^{\mathrm{CO}_2} v_s
+\rho_s (1-\phi) C_s^{\text{CO}_2} v_s
 \right]
 =
 \frac{\partial}{\partial x}
 \left[
-\rho_f \phi D_f^{\mathrm{CO}_2}
-\frac{\partial C_f^{\mathrm{CO}_2}}{\partial x}
+\rho_f \phi D_f^{\text{CO}_2}
+\frac{\partial C_f^{\text{CO}_2}}{\partial x}
 \right]
 ```
+
+where $C_f^{\text{CO}_2}$ and $C_s^{\text{CO}_2}$ are the maass fractions of $\text{CO}_2$ in fluids and solids, respectivley and $D_f^{\text{CO}_2}$ is the diffusion coefficient of $\text{CO}_2$ in the fluid. Lastly, the fluid flow can be described with Darcy's law (where the velocity of solids $v_s$ is assumed to be 0):
+
+```math
+\phi(v_f - v_s) = - \frac{k\phi^3}{\mu_f}\left(\frac{\partial p_f}{\partial x} + \rho_sg\right)
+```
+
+where $k$ is the permeability, $\mu_f$ is the dynamic viscosity of the fluid, $p_f$ is the fluid pressure and $g$ is the gravitational constant.
 
 ## Running the Script
 
