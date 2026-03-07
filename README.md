@@ -74,7 +74,7 @@ where $k$ is the permeability, $\mu_f$ is the dynamic viscosity of the fluid, $p
 
 ### Methods
 
-The thermodynamic equlibrium solid solution model was first assumed for 2 seperate Pressure and Temperature (PT) conditions, namely for low PT condiitons (0.3 GPa and 300°C, Beinlich et. al. 2020) and for high PT conditions (2.5 GPa and 800°C, Ota et. al. 2004). The two equilibrium thermodynamic models were then simulated in [Thermolab](https://hansjcv.github.io/Thermolab/) assuming the following oxide weight fractions (Beinlich et. al. 2020):
+The thermodynamic equlibrium solid solution model was first assumed for 2 seperate Pressure and Temperature (PT) conditions, namely for low PT condiitons (0.3 GPa and 300°C, Beinlich et. al. 2020) and for high PT conditions (2.5 GPa and 800°C, [Ota et. al. 2004](https://www.sciencedirect.com/science/article/abs/pii/S0024493704000027)). The two equilibrium thermodynamic models were then simulated in [Thermolab](https://hansjcv.github.io/Thermolab/) assuming the following oxide weight fractions (Beinlich et. al. 2020):
 
 ```math
 \text{CaO}: 1.01\% ;
