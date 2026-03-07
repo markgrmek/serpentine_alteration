@@ -100,7 +100,9 @@ The solid phases used in the model were Dolomite, Antigorite, Talc, Magnesite, C
 4. Preform calculations with the obtained values of $\rho_s$, $\rho_f$, $\mu_f$ and $C_s^{\text{MgO}_2}$
 5. Update $C_s^{\text{CO}_2}$ and $\mu_f$
 
-### Limitaitons
+### Discussion and Limitaitons
+
+Thermobaric conditions appear to influence the type of alteration more strongly than the overall rate of alteration. The model predicts a reaction front propagation of approximately 100 cm per year, which is higher than the ~13 cm per year estimated by Beinlich et al. (2020), but still comparable to the rate of tectonic plate motion. This suggests that such alteration processes may occur on timescales relevant to geological processes in newly formed oceanic lithosphere. Consequently, carbon storage in serpentine could represent a feasible option from the perspective of time efficiency.
 
 The comparison between the two thermobaric conditions is based solely on thermodynamic equilibrium rather than the kinetic model. At high pressure–temperature conditions, antigorite is not predicted to form, meaning that serpentine alteration is not represented. Additionally, the model assumes zero solid velocity, unrealistic porosity values, and a prescribed pressure gradient to satisfy numeric stability. Finally, the predicted $\text{CO}_2$ concentrations in the solid phase do not match the levels measured in some natural soapstones.
 
