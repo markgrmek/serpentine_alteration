@@ -2,6 +2,23 @@
 
 This repository provides a finite difference solver and resources for simulating the reactive fluid flow occuring during the alteration of serpentine in the deep Earth's crust.
 
+## Running the Script
+
+### Environment Setup
+
+```
+  python pip install requirements.txt
+```
+
+### Plotting the Equilibrium Thermodynamical Data
+The equilibrium thermodynamic [data](data) was obtained with the helo of [Thermolab](https://hansjcv.github.io/Thermolab/)
+The equilibrium thermodynamic plots are obtained by running [equilibrium_plotting.py](equilibrium_plotting.py) and are saved as .png in [figs](figs)
+
+### Running the Simulation
+1. The lookup tables are found in [const.py](const.py)
+2. The simulation is obtained by running [solver.py](solver.py). The simulation data is saved a .npz file in [output](output). Note that the simulation parameters are found at the beggining of the file
+3. The animations of the reactive fluid flow are obtained by running [simulation_plotting.py](simulation_plotting.py). The animations are saved as .gif in [figs](figs)
+
 ## Project Description
 
 ### Introduction
@@ -113,20 +130,3 @@ Beinlich, A., John, T., Vrijmoed, J. C., Tominaga, M., Magna, T., & Podladchikov
 Vrijmoed, J. C., & Podladchikov, Y. Y. (2022). Thermolab: A thermodynamics laboratory for nonlinear transport processes in open systems. Geochemistry, Geophysics, Geosystems, 23, e2021GC010303. https://doi.org/10.1029/2021GC010303
 
 Ota, Tsutomu, Masaru Terabayashi, and Ikuo Katayama. 2004. "Thermobaric Structure and Metamorphic Evolution of the Iratsu Eclogite Body in the Sanbagawa Belt, Central Shikoku, Japan." Journal of Metamorphic Geology 22, no. 3 (2004): 95–126. https://www.sciencedirect.com/science/article/pii/S0024493704000027
-
-## Running the Script
-
-### Environment Setup
-
-```
-  python pip install requirements.txt
-```
-
-### Plotting the Equilibrium Thermodynamical Data
-The equilibrium thermodynamic [data](data) was obtained with the helo of [Thermolab](https://hansjcv.github.io/Thermolab/)
-The equilibrium thermodynamic plots are obtained by running [equilibrium_plotting.py](equilibrium_plotting.py) and are saved as .png in [figs](figs)
-
-### Running the Simulation
-1. The lookup tables are found in [const.py](const.py)
-2. The simulation is obtained by running [solver.py](solver.py). The simulation data is saved a .npz file in [output](output). Note that the simulation parameters are found at the beggining of the file
-3. The animations of the reactive fluid flow are obtained by running [simulation_plotting.py](simulation_plotting.py). The animations are saved as .gif in [figs](figs)
