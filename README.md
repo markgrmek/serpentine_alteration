@@ -100,7 +100,13 @@ The solid phases used in the model were Dolomite, Antigorite, Talc, Magnesite, C
 4. Preform calculations with the obtained values of $\rho_s$, $\rho_f$, $\mu_f$ and $C_s^{\text{MgO}_2}$
 5. Update $C_s^{\text{CO}_2}$ and $\mu_f$
 
+### References
 
+Beinlich, A., John, T., Vrijmoed, J. C., Tominaga, M., Magna, T., & Podladchikov, Y. Y. (2020). Instantaneous rock transformations in the deep crust driven by reactive fluid flow. Nature Geoscience, 13, 307–312. https://doi.org/10.1038/s41561-020-0554-9
+
+Vrijmoed, J. C., & Podladchikov, Y. Y. (2022). Thermolab: A thermodynamics laboratory for nonlinear transport processes in open systems. Geochemistry, Geophysics, Geosystems, 23, e2021GC010303. https://doi.org/10.1029/2021GC010303
+
+Ota, Tsutomu, Masaru Terabayashi, and Ikuo Katayama. 2004. "Thermobaric Structure and Metamorphic Evolution of the Iratsu Eclogite Body in the Sanbagawa Belt, Central Shikoku, Japan." Journal of Metamorphic Geology 22, no. 3 (2004): 95–126. https://www.sciencedirect.com/science/article/pii/S0024493704000027
 
 ## Running the Script
 
