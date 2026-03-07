@@ -24,7 +24,16 @@ $$
 = 0
 $$
 
-where $\rho_s$ and $\rho_f$ are the solids and fluid density respectivley, $\phi$ is the fluid saturation level and $v_s$ and $v_f$ are the solids and fluid velocities respectivley.
+where $\rho_s$ and $\rho_f$ are the solids and fluid density respectivley, $\phi$ is the fluid saturation level and $v_s$ and $v_f$ are the solids and fluid velocities respectivley. Furthermore, the mass conservation of the immobile solid species is governed by:
+
+$$
+\frac{\partial}{\partial t}\left[\rho_s(1 - C_s^m)(1 - \phi)\right]
++
+\frac{\partial}{\partial x}\left[\rho_s(1 - C_s^m)(1 - \phi)v_s\right]
+= 0
+$$
+
+where $C_s^m$ is the weight fraction of the mobile oxides, namely $\text{H}_2\text{O}$, $\text{CO}_2$ and $\text{SiO}_2$
 
 ## Running the Script
 
