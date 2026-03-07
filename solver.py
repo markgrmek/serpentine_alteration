@@ -19,8 +19,8 @@ pres: float = P[PTtype]
 
 #TIME---------------------------------------------------------------------------
 time_tot: float = 0.002 #100*L**2/DCO2_B #total integration time (s)
-N_steps: int = int(1e9) #number of time steps
-N_steps_in_epoch: int = 100 #results get stored per each epoch
+N_steps: int = 20 #int(1e9) #number of time steps
+N_steps_in_epoch: int = 1 #results get stored per each epoch
 
 #INITIAL CONDITIONS-------------------------------------------------------------
 por0: np.ndarray = np.full(N_cells, POR_B) #initial porosity

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from typing import Literal
 from scipy.interpolate import interp1d
-from const import T, MOLAR_MASS, DCO2_B
+from const import T, MOLAR_MASS, DCO2_B, SEC_PER_YEAR
 
 def absmax(
         array: np.ndarray[float]
@@ -24,7 +24,7 @@ def normalize(
 def conv_t_years(
         time: float
         ) -> float:
-    return time/(DCO2_B*365*24*60*60)
+    return time/(DCO2_B*SEC_PER_YEAR)
 
 def fetch_lookup_df(
         dataset: Literal['general', 'solver'],
