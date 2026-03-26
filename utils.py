@@ -64,7 +64,3 @@ def create_solver_interpolators(
             fill_value='extrapolate')
         
     return output
-
-
-if __name__ == '__main__':
-    print(1)
