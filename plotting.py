@@ -16,7 +16,8 @@ def animate_rho_s(
         max_x: float = 1.0,
         plot_step: int = 1,
         save_animation: bool = True,
-        plt_show_pause: float = 0.01):
+        plt_show_pause: float = 0.01,
+        dpi: int = 300):
 
     #Data fetch-----------------------------------------
     data = np.load(rf"outputs\simulation_{PTtype}.npz")
@@ -52,6 +53,7 @@ def animate_rho_s(
         writer = ani.PillowWriter(fps=20, bitrate=10)
         animation.save(
             rf'figs\density_animation_{PTtype}.gif', 
+            dpi=dpi,
             writer=writer, 
             progress_callback = lambda i, n: print(f'Saving frame {i}/{n}')
             )
@@ -66,7 +68,8 @@ def animate_por(
         max_x: float = 1.0,
         plot_step: int = 1,
         save_animation: bool = True,
-        plt_show_pause: float = 0.01):
+        plt_show_pause: float = 0.01,
+        dpi: int = 300):
     
     #Data fetch-----------------------------------------
     data = np.load(rf"outputs\simulation_{PTtype}.npz")
@@ -102,7 +105,8 @@ def animate_por(
     if save_animation:
         writer = ani.PillowWriter(fps=10, bitrate=10)
         animation.save(
-            rf'figs\porosity_animation_{PTtype}.gif', 
+            rf'figs\porosity_animation_{PTtype}.gif',
+            dpi=dpi, 
             writer=writer, 
             progress_callback = lambda i, n: print(f'Saving frame {i}/{n}')
             )
@@ -117,7 +121,8 @@ def animate_weight_fracs(
         max_x: float = 1.0,
         plot_step: int = 1,
         save_animation: bool = True,
-        plt_show_pause: float = 0.01):
+        plt_show_pause: float = 0.01,
+        dpi: int = 300):
     
     #Data fetch-----------------------------------------
     data = np.load(rf"outputs\simulation_{PTtype}.npz")
@@ -169,6 +174,7 @@ def animate_weight_fracs(
         writer = ani.PillowWriter(fps=20, bitrate=10)
         animation.save(
             rf'figs\weight_frac_animation_{PTtype}.gif', 
+            dpi=dpi,
             writer=writer, 
             savefig_kwargs={"bbox_inches": "tight"},
             progress_callback = lambda i, n: print(f'Saving frame {i}/{n}')
@@ -184,7 +190,8 @@ def animate_mineral_vol_fracs(
         max_x: float = 1.0,
         plot_step: int = 1,
         save_animation: bool = True,
-        plt_show_pause: float = 0.01):
+        plt_show_pause: float = 0.01,
+        dpi: int = 300):
     
     #Data fetch-----------------------------------------
     data = np.load(rf"outputs\simulation_{PTtype}.npz")
@@ -248,6 +255,7 @@ def animate_mineral_vol_fracs(
         animation.save(
             rf'figs\mineral_animation_{PTtype}.gif', 
             writer=writer,
+            dpi=dpi,
             savefig_kwargs={"bbox_inches": "tight"},
             progress_callback = lambda i, n: print(rf'Saving frame {i}/{n}')
             )
@@ -265,7 +273,8 @@ def plot_T_vs_wCO2sys(
         dataset: Literal['general', 'solver'],
         PTtype: Literal['highPT', 'lowPT'],
         key: str,
-        savefig: bool = True
+        savefig: bool = True,
+        dpi: int = 300
         ) -> None:
 
     #DATA FETCH-----------------------------------------
@@ -292,7 +301,7 @@ def plot_T_vs_wCO2sys(
     ax.set_xlabel(r'$C_{s+f}^{\text{CO}_2}$ $\left(\frac{kg}{kg}\right)$')
     
 
-    if savefig: fig.savefig(rf'figs\{key}_sys_{dataset}_{PTtype}')
+    if savefig: fig.savefig(rf'figs\{key}_sys_{dataset}_{PTtype}', dpi=dpi)
 
     plt.show() 
 
@@ -305,7 +314,8 @@ def plot_T_vs_wCO2solids(
         PTtype: Literal['highPT', 'lowPT'],
         key: str,
         N_inter_pts: int = 100,
-        savefig: bool = True
+        savefig: bool = True,
+        dpi: int = 300
         ) -> None:
 
     #DATA FETCH-----------------------------------------
@@ -350,7 +360,7 @@ def plot_T_vs_wCO2solids(
     ax.set_xlabel(r'$C_s^{\text{CO}_2}$ $\left(\frac{kg}{kg}\right)$')
     
 
-    if savefig: fig.savefig(rf'figs\{key}_sys_{dataset}_{PTtype}')
+    if savefig: fig.savefig(rf'figs\{key}_sys_{dataset}_{PTtype}', dpi=dpi)
 
     plt.show() 
 
