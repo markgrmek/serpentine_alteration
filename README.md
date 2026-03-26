@@ -39,7 +39,7 @@ Fluid-rock interactions provide a link between chemical reactions and mass-energ
 The main serpentine minerals are antigorite, chrysotile and lizardite, which are associated with ultramafic igneous rock formations. The petrological compositional space thus consists of $\text{SiO}_2$, $\text{Al}_2\text{O}_3$, $\text{MgO}$, $\text{FeO}$, $\text{Fe}_2\text{O}_3$  $\text{H}_2\text{O}$, $\text{CO}_2$ and $\text{CaO}$.
 
 <p align="center">
-  <img src="https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41561-020-0554-9/MediaObjects/41561_2020_554_Fig2_HTML.png" width="650">
+  <img src="https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41561-020-0554-9/MediaObjects/41561_2020_554_Fig2_HTML.png" width="700">
   <br>
   <em> a) Serpentine to soapstone alteration front and b) schematic representation of the alteration process (taken from <a href="https://www.nature.com/articles/s41561-020-0554-9">Beinlich et. al. 2020</a>)</em>
 </p>
@@ -135,8 +135,8 @@ The simulation domain of $L=1m$ was partitioned into 100 cells. At $t=0$ porosit
 As an example, the values  obtained by the [solver](solver.py) of the weight fractions $C_s^{\text{CO}_2}$, $C_f^{\text{CO}_2}$, $C_s^{\text{SiO}_2}$, $C_s^{\text{H}_2\text{O}}$ and the volumetric proportions of different minerals in low PT conditions are displayed in the animations below:
 
 <p align="center">
-  <img src="figs/weight_frac_animation_lowPT.gif" width="500">
-  <img src="figs/mineral_animation_lowPT.gif" width="500">
+  <img src="figs/weight_frac_animation_lowPT.gif" width="700">
+  <img src="figs/mineral_animation_lowPT.gif" width="700">
 </p>
 
 ### Discussion and Limitaitons
