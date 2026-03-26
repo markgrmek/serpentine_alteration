@@ -38,6 +38,12 @@ Fluid-rock interactions provide a link between chemical reactions and mass-energ
 
 The main serpentine minerals are antigorite, chrysotile and lizardite, which are associated with ultramafic igneous rock formations. The petrological compositional space thus consists of $\text{SiO}_2$, $\text{Al}_2\text{O}_3$, $\text{MgO}$, $\text{FeO}$, $\text{Fe}_2\text{O}_3$  $\text{H}_2\text{O}$, $\text{CO}_2$ and $\text{CaO}$.
 
+<p align="center">
+  <img src="https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41561-020-0554-9/MediaObjects/41561_2020_554_Fig2_HTML.png" width="650">
+  <br>
+  <em> a) Serpentine to soapstone alteration front and b) schematic representation of the alteration process (taken from <a href="https://www.nature.com/articles/s41561-020-0554-9">Beinlich et. al. 2020</a>)</em>
+</p>
+
 ### Physical Background
 
 The 1D alteration of serpentine can be described with the following advection-diffusion-reaction equation
