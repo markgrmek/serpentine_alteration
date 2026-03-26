@@ -12,12 +12,13 @@ This repository provides a finite difference solver and resources for simulating
 
 ### Plotting the Equilibrium Thermodynamical Data
 The equilibrium thermodynamic [data](data) was obtained with the helo of [Thermolab](https://hansjcv.github.io/Thermolab/)
-The equilibrium thermodynamic plots are obtained by running [equilibrium_plotting.py](equilibrium_plotting.py) and are saved as .png in [figs](figs)
 
 ### Running the Simulation
 1. The lookup tables are found in [const.py](const.py)
 2. The simulation is obtained by running [solver.py](solver.py). The simulation data is saved a .npz file in [output](output). Note that the simulation parameters are found at the beggining of the file
-3. The animations of the reactive fluid flow are obtained by running [simulation_plotting.py](simulation_plotting.py). The animations are saved as .gif in [figs](figs)
+
+### Plotting the results
+Both the equilibrium thermodynamic plots and the animations of the reactive fluid flow are obtained by running [simulation_plotting.py](simulation_plotting.py). The animations are saved as .png and .gif in [figs](figs)
 
 ## Project Description
 
@@ -109,13 +110,28 @@ The thermodynamic equlibrium solid solution model was first assumed for 2 sepera
 \text{H}_2\text{O}: 9.68\%
 ```
 
-The solid phases used in the model were Dolomite, Antigorite, Talc, Magnesite, Chlorite, Brucite, Orthopyroxene, Olivine, Quartz, Periclase, Corundum, Andalusite, Magnetite, Hematite, Lime and Calcite. The fluid phase used in the model was $\text{H}_2\text{O} - \text{CO}_2$. The obtained equilibrium thermodynamic variables were then stored and used as a lookup table in the main diffusion-advection-reaction equation simulation. The simulation domain of $L=1m$ was partitioned into 100 cells. At $t=0$ porosity $\phi$ was assumed constant across all cells, while the fluid pressure $p_f$ was assumed as a uniform gradient from $x=0$ to $x=1$ going from 0.3 GPa to 0.0 GPa for low PT conditions and 2.5 GPa to 0.0 GPa for low PT conditions. The use of the lookup table in the simulation in a single time step was used as such:
+The solid phases used in the model were Dolomite, Antigorite, Talc, Magnesite, Chlorite, Brucite, Orthopyroxene, Olivine, Quartz, Periclase, Corundum, Andalusite, Magnetite, Hematite, Lime and Calcite. The fluid phase used in the model was $\text{H}_2\text{O} - \text{CO}_2$. The obtained equilibrium thermodynamic variables were then stored and used as a lookup table in the main diffusion-advection-reaction equation simulation. As an example, the thermodynamic equilibrium results for the weight fractions $C_s^{\text{CO}_2}$ and $C_s^{\text{MgO}}$ in low PT conditions are displayed in the plots below:
+
+<p align="center">
+  <img src="figs/wCO2_s_sys_general_lowPT.png" width="500">
+  <img src="figs/wMg_s_sys_general_lowPT.png" width="500">
+</p>
+
+
+The simulation domain of $L=1m$ was partitioned into 100 cells. At $t=0$ porosity $\phi$ was assumed constant across all cells, while the fluid pressure $p_f$ was assumed as a uniform gradient from $x=0$ to $x=1$ going from 0.3 GPa to 0.0 GPa for low PT conditions and 2.5 GPa to 0.0 GPa for low PT conditions. The use of the lookup table in the simulation in a single time step was used as such:
 
 1. From the lookup table fetch $C_s^{\text{CO}_2}$
 2. From the lookup table fetch $\rho_s$, $\rho_f$, $\mu_f$ and $C_s^{\text{MgO}_2}$. The latter represents the mass fraction of immobile solid species
 3. Get the values of $\rho_s$, $\rho_f$, $\mu_f$ and $C_s^{\text{MgO}_2}$ by preforming linear interpolation in respect to $C_s^{\text{CO}_2}$
 4. Preform calculations with the obtained values of $\rho_s$, $\rho_f$, $\mu_f$ and $C_s^{\text{MgO}_2}$
 5. Update $C_s^{\text{CO}_2}$ and $\mu_f$
+
+As an example, the values  obtained by the [solver](solver.py) of the weight fractions $C_s^{\text{CO}_2}$, $C_f^{\text{CO}_2}$, $C_s^{\text{SiO}_2}$, $C_s^{\text{H}_2\text{O}}$ and the volumetric proportions of different minerals in low PT conditions are displayed in the animations below:
+
+<p align="center">
+  <img src="figs/weight_frac_animation_lowPT.gif" width="500">
+  <img src="figs/mineral_animation_lowPT.gif" width="500">
+</p>
 
 ### Discussion and Limitaitons
 
