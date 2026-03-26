@@ -3,7 +3,7 @@ from const import *
 from utils import pair_avg, create_solver_interpolators, absmax
 
 #GENERAL SOLVER PARAMS----------------------------------------------------------
-PTtype: str = 'lowPT'
+PTtype: str = 'highPT' #lowPT
 npow: int = 3 #non linearity in permeability
 N_sweeps: int = int(1e5) #number of sweeps
 N_Pf_max: int = int(1e4) #maximum number of fluid pressure sweeps
@@ -12,15 +12,15 @@ interp = create_solver_interpolators(PTtype)
 
 #DOMAIN-------------------------------------------------------------------------
 L: float = 1.0 #domain length (m)
-N_cells: int = 200 #number of cells
+N_cells: int = 200 #number of cells 
 x: np.ndarray  = np.linspace(0, L, N_cells+1) #discrete domain
 dx: float = L/N_cells  #step in x (m)
 pres: float = P[PTtype]
 
 #TIME---------------------------------------------------------------------------
-time_tot: float = 0.002 #100*L**2/DCO2_B #total integration time (s)
-N_steps: int = 20 #int(1e9) #number of time steps
-N_steps_in_epoch: int = 1 #results get stored per each epoch
+time_tot: float = L**2/DCO2_B #total integration time (s)
+N_steps: int = int(1e9) #number of time steps
+N_steps_in_epoch: int = 100 #results get stored per each epoch
 
 #INITIAL CONDITIONS-------------------------------------------------------------
 por0: np.ndarray = np.full(N_cells, POR_B) #initial porosity

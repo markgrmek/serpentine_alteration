@@ -37,13 +37,13 @@ MOLAR_MASS['H2O'] = 2*MOLAR_MASS['H'] + MOLAR_MASS['O']
 
 #THERMOLAB NAMING CONVENTION--------------------------------
 COLUMN_MAP = {
-    'rho_s': 'Solid density',
-    'rho_fl': 'Fluid density',
-    'mu_fl': 'Fluid viscosity',
-    'wCO2_fl': 'CO₂ mass frac. (fluid)',
-    'wMg_s': 'Mg mass frac. (solid)',
-    'wSiO2_s': 'SiO₂ mass frac. (solid)',
-    'wH2O_s': 'H₂O mass frac. (solid)',
+    'rho_s': r'\rho_s',
+    'rho_fl': r'\rho_f',
+    'mu_fl': r'\mu_f',
+    'wCO2_fl': r'C_f^{\text{CO}_2}',
+    'wMg_s': r'C_s^{\text{MgO}}',
+    'wSiO2_s': r'C_s^{\text{SiO}_2}',
+    'wH2O_s': r'C_s^{\text{H}_2\text{O}}',
     'Dolomite': 'Dolomite',
     'Antigorite': 'Antigorite',
     'Talc': 'Talc',
@@ -58,6 +58,28 @@ COLUMN_MAP = {
     'cc,tc-ds633': 'Calcite',
     'cor,tc-ds633': 'Corundum'
 }
+# COLUMN_MAP = {
+#     'rho_s': 'Solid density',
+#     'rho_fl': 'Fluid density',
+#     'mu_fl': 'Fluid viscosity',
+#     'wCO2_fl': 'CO₂ mass frac. (fluid)',
+#     'wMg_s': 'Mg mass frac. (solid)',
+#     'wSiO2_s': 'SiO₂ mass frac. (solid)',
+#     'wH2O_s': 'H₂O mass frac. (solid)',
+#     'Dolomite': 'Dolomite',
+#     'Antigorite': 'Antigorite',
+#     'Talc': 'Talc',
+#     'Magnesite': 'Magnesite',
+#     'Chlorite': 'Chlorite',
+#     'Orthopyroxene': 'Orthopyroxene',
+#     'Olivine': 'Olivine',
+#     'q,tc-ds633': 'Quartz',
+#     'mt,tc-ds633': 'Magnetite',
+#     'hem,tc-ds633': 'Hematite',
+#     'lime,tc-ds633': 'Lime',
+#     'cc,tc-ds633': 'Calcite',
+#     'cor,tc-ds633': 'Corundum'
+# }
 
 #SOLVER OUTPUT MAP FOR INTERPOLATED RESULTS--------------------
 INTERP_MAP = {
