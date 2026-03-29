@@ -18,7 +18,7 @@ The equilibrium thermodynamic [data](data) was obtained with the helo of [Thermo
 2. The simulation is obtained by running [solver.py](solver.py). The simulation data is saved a .npz file in [output](output). Note that the simulation parameters are found at the beggining of the file
 
 ### Plotting the results
-Both the equilibrium thermodynamic plots and the animations of the reactive fluid flow are obtained by running [simulation_plotting.py](simulation_plotting.py). The animations are saved as .png and .gif in [figs](figs)
+Both the equilibrium thermodynamic plots and the animations of the reactive fluid flow are obtained by running [plotting.py](plotting.py). The animations are saved as .png and .gif in [figs](figs)
 
 ## Project Description
 
